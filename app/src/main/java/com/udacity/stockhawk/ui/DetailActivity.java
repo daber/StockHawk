@@ -4,39 +4,33 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.CandleStickChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.CandleDataSet;
 import com.github.mikephil.charting.data.CandleEntry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 /**
  * Created by daber on 14/01/17.
  */
 
-public class DetailActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String EXTRA_STOCK_NAME = "extra_stock_name";
-    public static final int HISTORY_LOADER = 1;
+    private static final int HISTORY_LOADER = 1;
     private Cursor cursor = null;
     @BindView(R.id.chart_view)
     CandleStickChart mChart;
@@ -51,6 +45,8 @@ public class DetailActivity extends FragmentActivity implements LoaderManager.Lo
         ButterKnife.bind(this);
         getSupportLoaderManager().initLoader(HISTORY_LOADER, null, this);
         setupChart();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
     }
 
     private void setupChart() {
@@ -84,7 +80,6 @@ public class DetailActivity extends FragmentActivity implements LoaderManager.Lo
 
         mChart.getLegend().setEnabled(false);
     }
-
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -139,20 +134,5 @@ public class DetailActivity extends FragmentActivity implements LoaderManager.Lo
         if (cursor != null) {
             cursor.close();
         }
-    }
-}
-
-class DateAxisFormatter implements IAxisValueFormatter {
-    private final DateFormat format;
-    private final long reference;
-
-    DateAxisFormatter(DateFormat dateformat, long ref) {
-        format = dateformat;
-        reference = ref;
-    }
-
-    @Override
-    public String getFormattedValue(float value, AxisBase axis) {
-        return format.format(new Date(-reference + (long) value));
     }
 }
