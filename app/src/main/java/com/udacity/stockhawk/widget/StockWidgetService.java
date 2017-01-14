@@ -2,8 +2,10 @@ package com.udacity.stockhawk.widget;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.os.Handler;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -35,16 +37,11 @@ public class StockWidgetService extends RemoteViewsService {
         DecimalFormat dollarFormatWithPlus = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
         DecimalFormat percentageFormat = (DecimalFormat) NumberFormat.getPercentInstance(Locale.getDefault());
         Cursor cursor;
-        DataSetObserver observer = new DataSetObserver() {
+        ContentObserver observer = new ContentObserver(new Handler()) {
             @Override
-            public void onChanged() {
-                super.onChanged();
+            public void onChange(boolean selfChange) {
+                super.onChange(selfChange);
                 AppWidgetManager.getInstance(service).notifyAppWidgetViewDataChanged(widgetId, R.id.stockView);
-            }
-
-            @Override
-            public void onInvalidated() {
-                super.onInvalidated();
             }
         };
 
@@ -59,11 +56,12 @@ public class StockWidgetService extends RemoteViewsService {
             percentageFormat.setPositivePrefix("+");
             widgetId = appWidgetId;
 
+
         }
 
         @Override
         public void onCreate() {
-
+            service.getContentResolver().registerContentObserver(Contract.Quote.URI,true,observer);
         }
 
         @Override
@@ -80,7 +78,7 @@ public class StockWidgetService extends RemoteViewsService {
             String where = Contract.Quote.COLUMN_SYMBOL + " IN (" + Joiner.on(", ").join(escaped_stocks) + ")";
 
             cursor = service.getContentResolver().query(Contract.Quote.URI, null, where, null, Contract.Quote.COLUMN_SYMBOL);
-            cursor.registerDataSetObserver(observer);
+
         }
 
         @Override
@@ -88,6 +86,7 @@ public class StockWidgetService extends RemoteViewsService {
             if (cursor != null) {
                 cursor.close();
             }
+            service.getContentResolver().unregisterContentObserver(observer);
 
         }
 
