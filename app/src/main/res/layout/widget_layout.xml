@@ -34,7 +34,7 @@
             android:layout_height="match_parent"
             android:background="@android:color/background_dark"
             android:gravity="center"
-            android:text="@string/error_no_stocks"
+            android:text="@string/error_no_stocks_widget"
             android:textColor="#ffffff"
             android:textSize="20sp"
             android:textStyle="bold" />
