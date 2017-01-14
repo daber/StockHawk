@@ -31,5 +31,7 @@
 
     <string name="toast_stock_added_no_connectivity">Symbol %s added. Will refresh when network available.</string>
     <string name="toast_no_connectivity">Will refresh when network available.</string>
+    <string name="button_add_new_stock">Add new stock</string>
+    <string name="cd_enter_stock_name">Enter stock name to add</string>
 
 </resources>

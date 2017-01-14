@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/stockName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Stock name"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Display3"
+        android:gravity="center"
+        />
+    <com.github.mikephil.charting.charts.CandleStickChart
+        android:id="@+id/chart_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.github.mikephil.charting.charts.CandleStickChart>
+</LinearLayout>

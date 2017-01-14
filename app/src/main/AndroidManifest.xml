@@ -23,6 +23,12 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.DetailActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+            </intent-filter>
+        </activity>
+
         <service
             android:name=".sync.QuoteIntentService"
             android:exported="false" />
