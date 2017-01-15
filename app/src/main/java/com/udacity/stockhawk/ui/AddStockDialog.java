@@ -68,7 +68,10 @@ public class AddStockDialog extends DialogFragment {
     private void addStock() {
         Activity parent = getActivity();
         if (parent instanceof MainActivity) {
-            ((MainActivity) parent).addStock(stock.getText().toString());
+            String[] items = stock.getText().toString().toUpperCase().split("\\w");
+            for (String i : items) {
+                ((MainActivity) parent).addStock(stock.getText().toString().toUpperCase());
+            }
         }
         dismissAllowingStateLoss();
     }

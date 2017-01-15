@@ -71,51 +71,59 @@ public final class QuoteSyncJob {
 
             while (iterator.hasNext()) {
                 String symbol = iterator.next();
-
+                boolean removeSymbol = false;
 
                 Stock stock = quotes.get(symbol);
-                StockQuote quote = stock.getQuote();
+                if(stock != null) {
+                    StockQuote quote = stock.getQuote();
 
-                if (quote.getPrice() != null && quote.getChange() != null && quote.getChangeInPercent() != null) {
+                    if (quote.getPrice() != null && quote.getChange() != null && quote.getChangeInPercent() != null) {
 
-                    BigDecimal price = quote.getPrice();
-                    BigDecimal change = quote.getChange();
-                    BigDecimal percentChange = quote.getChangeInPercent();
+                        BigDecimal price = quote.getPrice();
+                        BigDecimal change = quote.getChange();
+                        BigDecimal percentChange = quote.getChangeInPercent();
 
-                    // WARNING! Don't request historical data for a stock that doesn't exist!
-                    // The request will hang forever X_x
-                    List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
+                        // WARNING! Don't request historical data for a stock that doesn't exist!
+                        // The request will hang forever X_x
+                        List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
 
-                    StringBuilder historyBuilder = new StringBuilder();
+                        StringBuilder historyBuilder = new StringBuilder();
 
-                    for (HistoricalQuote it : history) {
-                        historyBuilder.append(it.getDate().getTimeInMillis());
-                        historyBuilder.append(", ");
-                        historyBuilder.append(it.getHigh());
-                        historyBuilder.append(", ");
-                        historyBuilder.append(it.getLow());
-                        historyBuilder.append(", ");
-                        historyBuilder.append(it.getOpen());
-                        historyBuilder.append(", ");
-                        historyBuilder.append(it.getClose());
-                        historyBuilder.append("\n");
+                        for (HistoricalQuote it : history) {
+                            historyBuilder.append(it.getDate().getTimeInMillis());
+                            historyBuilder.append(", ");
+                            historyBuilder.append(it.getHigh());
+                            historyBuilder.append(", ");
+                            historyBuilder.append(it.getLow());
+                            historyBuilder.append(", ");
+                            historyBuilder.append(it.getOpen());
+                            historyBuilder.append(", ");
+                            historyBuilder.append(it.getClose());
+                            historyBuilder.append("\n");
+
+                        }
+
+                        ContentValues quoteCV = new ContentValues();
+                        quoteCV.put(Contract.Quote.COLUMN_SYMBOL, symbol);
+                        quoteCV.put(Contract.Quote.COLUMN_PRICE, price.floatValue());
+                        quoteCV.put(Contract.Quote.COLUMN_PERCENTAGE_CHANGE, percentChange.floatValue());
+                        quoteCV.put(Contract.Quote.COLUMN_ABSOLUTE_CHANGE, change.floatValue());
+
+
+                        quoteCV.put(Contract.Quote.COLUMN_HISTORY, historyBuilder.toString());
+
+                        quoteCVs.add(quoteCV);
+                    } else {
+                        //remove nonexisting stocks
+                        removeSymbol = true;
 
                     }
+                }else{
+                    removeSymbol = true;
+                }
 
-                    ContentValues quoteCV = new ContentValues();
-                    quoteCV.put(Contract.Quote.COLUMN_SYMBOL, symbol);
-                    quoteCV.put(Contract.Quote.COLUMN_PRICE, price.floatValue());
-                    quoteCV.put(Contract.Quote.COLUMN_PERCENTAGE_CHANGE, percentChange.floatValue());
-                    quoteCV.put(Contract.Quote.COLUMN_ABSOLUTE_CHANGE, change.floatValue());
-
-
-                    quoteCV.put(Contract.Quote.COLUMN_HISTORY, historyBuilder.toString());
-
-                    quoteCVs.add(quoteCV);
-                } else {
-                    //remove nonexisting stocks
-                    PrefUtils.removeStock(context, symbol);
-
+                if(removeSymbol){
+                    PrefUtils.removeStock(context,symbol);
                 }
 
             }
