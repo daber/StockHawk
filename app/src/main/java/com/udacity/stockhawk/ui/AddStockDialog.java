@@ -14,8 +14,12 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.udacity.stockhawk.R;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,6 +30,7 @@ public class AddStockDialog extends DialogFragment {
     @SuppressWarnings("WeakerAccess")
     @BindView(R.id.dialog_stock)
     EditText stock;
+    Pattern validStockPattern = Pattern.compile("[A-Z]+");
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -40,6 +45,7 @@ public class AddStockDialog extends DialogFragment {
         stock.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
                 addStock();
                 return true;
             }
@@ -65,15 +71,28 @@ public class AddStockDialog extends DialogFragment {
         return dialog;
     }
 
+    private boolean validateStock() {
+        String text = stock.getText().toString();
+        Matcher m = validStockPattern.matcher(text);
+        return m.matches();
+
+    }
+
     private void addStock() {
         Activity parent = getActivity();
-        if (parent instanceof MainActivity) {
-            String[] items = stock.getText().toString().toUpperCase().split("\\w");
-            for (String i : items) {
-                ((MainActivity) parent).addStock(stock.getText().toString().toUpperCase());
+        if (validateStock()) {
+
+            if (parent instanceof MainActivity) {
+                String[] items = stock.getText().toString().toUpperCase().split("\\w");
+                for (String s : items) {
+                    ((MainActivity) parent).addStock(s);
+                }
             }
+            dismissAllowingStateLoss();
+        } else {
+            Toast.makeText(parent, R.string.dialog_errro_invalid_stock, Toast.LENGTH_LONG).show();
+            stock.setText("");
         }
-        dismissAllowingStateLoss();
     }
 
 
